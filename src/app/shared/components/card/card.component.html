@@ -6,7 +6,6 @@
       <span class="material-symbols-outlined pl-2"> playlist_add </span>
     </h1>
     <hr />
-    <h3 class="text-white font-thin">{{ formStructure.description }}</h3>
   </div>
 
   <!-- Formulario principal -->
@@ -18,7 +17,7 @@
           <!-- Campo de texto -->
           <div *ngSwitchCase="'text'">
             <!-- Contenedor para el campo de texto con etiquetas y control -->
-            <div class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg">
+            <div class="flex flex-col gap-2 bg-slate-700 p-3 rounded-lg">
               <label [for]="field.name" class="text-white font-bold">{{
                 field.label
               }}</label>
@@ -54,7 +53,7 @@
           <!-- Campo de fecha -->
           <div *ngSwitchCase="'date'">
             <!-- Contenedor para el campo de fecha con etiquetas y control -->
-            <div class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg">
+            <div class="flex flex-col gap-2 bg-slate-700 p-3 rounded-lg">
               <label [for]="field.name" class="text-white font-bold">{{
                 field.label
               }}</label>
@@ -82,7 +81,7 @@
           <!-- Campo de personas asociadas (array) -->
           <div
             *ngSwitchCase="'array'"
-            class="flex flex-col gap-2 rounded-xl bg-slate-600 p-3"
+            class="flex flex-col gap-2 rounded-xl bg-slate-700 p-3"
           >
             <div class="flex justify-between items-center">
               <label class="text-white font-bold">{{ field.label }}</label>
@@ -116,7 +115,7 @@
                 "
                 [formGroupName]="i"
               >
-                <div class="flex flex-col gap-4 bg-slate-500 p-3 rounded-lg">
+                <div class="flex flex-col gap-4 bg-slate-600 p-3 rounded-lg">
                   <!-- Título de persona y botón para eliminar -->
                   <div class="flex justify-between items-center">
                     <h1 class="text-white font-normal">
@@ -142,7 +141,7 @@
                   <!-- Campo Nombre dentro del grupo de persona -->
                   <div>
                     <div
-                      class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
+                      class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
                     >
                       <label class="text-white font-bold"
                         >Nombre completo:</label
@@ -169,7 +168,7 @@
                   <!-- Campo Edad dentro del grupo de persona -->
                   <div>
                     <div
-                      class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
+                      class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
                     >
                       <label class="text-white font-bold">Edad:</label>
                       <input
@@ -201,7 +200,7 @@
                   <!-- Campo Habilidades (array) dentro del grupo de persona -->
                   <div
                     formArrayName="habilidades"
-                    class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
+                    class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
                   >
                     <div class="flex justify-between items-center">
                       <label class="text-white font-bold">Habilidades</label>
@@ -224,10 +223,10 @@
                       [formGroupName]="j"
                     >
                       <div
-                        class="flex flex-col gap-2 bg-slate-700 p-3 rounded-lg"
+                        class="flex flex-col gap-2 bg-slate-400 p-3 rounded-lg"
                       >
                         <div class="flex justify-between items-center">
-                          <label for="nombre" class="text-white font-thin"
+                          <label for="nombre" class="text-white font-light"
                             >Habilidad #{{ j + 1 }}</label
                           >
                           <button

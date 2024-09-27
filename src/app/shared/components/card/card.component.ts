@@ -23,7 +23,6 @@ export class CardComponent implements OnInit {
   // Estructura del formulario
   formStructure = {
     title: 'Crear Nueva Tarea',
-    description: 'Completa los datos para crear una tarea.',
     fields: [
       {
         name: 'nombre',
