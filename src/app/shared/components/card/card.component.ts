@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -19,6 +19,8 @@ import { FormFieldInterface } from '../../interfaces/form-field-interface';
 })
 export class CardComponent implements OnInit {
   formGroup: FormGroup;
+  @Output() onClose = new EventEmitter<void>();
+  isLoading: boolean = false;
 
   // Estructura del formulario
   formStructure = {
@@ -130,6 +132,14 @@ export class CardComponent implements OnInit {
       this.formGroup.markAllAsTouched();
       return;
     }
+
+    this.isLoading = true;
+
+    setTimeout(() => {
+      this.isLoading = false;
+      this.onClose.emit();
+    }, 3000);
+
     console.log(this.formGroup.value);
   }
 }

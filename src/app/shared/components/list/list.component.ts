@@ -39,6 +39,8 @@ export class ListComponent {
     },
   ];
 
+  createModal: boolean = false;
+
   filter: 'all' | 'completed' | 'pending' = 'all'; // Estado del filtro
 
   get filteredTasks() {
@@ -56,5 +58,22 @@ export class ListComponent {
 
   filterTasks(filter: 'all' | 'completed' | 'pending') {
     this.filter = filter; // Cambia el filtro
+  }
+
+  changeModalState(modalName: string) {
+    switch (modalName) {
+      case 'create':
+        this.createModal = !this.createModal;
+        break;
+    }
+  }
+
+  onOpen(modalName: string) {
+    this.changeModalState(modalName);
+    document.body.style.overflow = 'hidden';
+  }
+  onClose(modalName: string) {
+    this.changeModalState(modalName);
+    document.body.style.overflow = 'visible';
   }
 }
