@@ -42,7 +42,10 @@
               >
               <span *ngIf="formGroup.get(field.name)?.errors?.['minlength']"
                 >Mínimo
-                {{ formGroup.get(field.name)?.errors?.['minlength']?.requiredLength }}
+                {{
+                  formGroup.get(field.name)?.errors?.['minlength']
+                    ?.requiredLength
+                }}
                 caracteres.</span
               >
             </div>
@@ -91,6 +94,17 @@
               >
                 <span class="material-symbols-outlined"> person_add </span>
               </button>
+            </div>
+
+            <!-- Mostrar mensaje de error si hay nombres duplicados en el FormArray -->
+            <div
+              *ngIf="
+                getPersonasAsociadas().hasError('nombreDuplicado') &&
+                getPersonasAsociadas().touched
+              "
+              class="text-red-500"
+            >
+              <span>Los nombres de las personas no pueden repetirse.</span>
             </div>
 
             <!-- Listado dinámico de personas asociadas -->
@@ -174,6 +188,9 @@
                     >
                       <span *ngIf="persona.get('edad')?.errors?.['required']"
                         >La edad es obligatoria.</span
+                      >
+                      <span *ngIf="persona.get('edad')?.errors?.['min']"
+                        >Debes ser mayor de 18 años.</span
                       >
                       <span *ngIf="persona.get('edad')?.errors?.['min']"
                         >Debes ser mayor de 18 años.</span

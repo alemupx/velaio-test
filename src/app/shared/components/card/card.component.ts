@@ -1,5 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { ValidarNombresUnicosService } from '../../validators/validar-nombres-unicos.service';
 
 // Define una interfaz para los campos del formulario
 interface FormField {
@@ -11,8 +19,10 @@ interface FormField {
 
 @Component({
   selector: 'app-card',
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.css'],
+  standalone: true,
 })
 export class CardComponent implements OnInit {
   formGroup: FormGroup;
@@ -43,7 +53,10 @@ export class CardComponent implements OnInit {
     ] as FormField[], // Especificar que `fields` es un arreglo de `FormField`
   };
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private validarNombresUnicosValidator: ValidarNombresUnicosService
+  ) {
     this.formGroup = this.fb.group({});
   }
 
@@ -56,7 +69,10 @@ export class CardComponent implements OnInit {
     this.formStructure.fields.forEach((field) => {
       const validators = this.mapValidators(field.validators || {});
       if (field.type === 'array') {
-        group[field.name] = this.fb.array([this.crearPersona()]);
+        group[field.name] = this.fb.array(
+          [this.crearPersona()],
+          this.validarNombresUnicosValidator.validarNombresUnicos
+        );
       } else {
         group[field.name] = this.fb.control('', validators);
       }
