@@ -8,14 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ValidarNombresUnicosService } from '../../validators/validar-nombres-unicos.service';
-
-// Define una interfaz para los campos del formulario
-interface FormField {
-  name: string;
-  type: string;
-  label: string;
-  validators: { required?: boolean; minlength?: number; min?: number };
-}
+import { FormFieldInterface } from '../../interfaces/form-field-interface';
 
 @Component({
   selector: 'app-card',
@@ -50,7 +43,7 @@ export class CardComponent implements OnInit {
         label: 'Personas Asociadas',
         validators: {},
       },
-    ] as FormField[], // Especificar que `fields` es un arreglo de `FormField`
+    ] as FormFieldInterface[], // Especificar que `fields` es un arreglo de `FormField`
   };
 
   constructor(
