@@ -1,66 +1,99 @@
-<div class="bg-gray-800 p-8 m-2 rounded-lg">
+<div class="bg-gray-800 p-8 m-4 rounded-lg">
+  <!-- Título y descripción del formulario -->
   <div>
-    <h1 class="text-white font-bold text-lg pb-2 flex items-center">
+    <h1 class="text-white font-black text-lg pb-2 flex items-center">
       {{ formStructure.title }}
       <span class="material-symbols-outlined pl-2"> playlist_add </span>
     </h1>
     <hr />
-    <h3 class="text-white font-light">{{ formStructure.description }}</h3>
+    <h3 class="text-white font-thin">{{ formStructure.description }}</h3>
   </div>
 
+  <!-- Formulario principal -->
   <form class="flex flex-col" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <div class="flex flex-col gap-4 py-6">
+      <!-- Recorrer los campos del formulario definidos en formStructure -->
       <div *ngFor="let field of formStructure.fields">
         <ng-container [ngSwitch]="field.type">
-          <!-- Campos de texto -->
-          <div
-            *ngSwitchCase="'text'"
-            class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
-          >
-            <label [for]="field.name" class="text-white font-bold">{{
-              field.label
-            }}</label>
-            <input
-              class="rounded-xl"
-              [id]="field.name"
-              [formControlName]="field.name"
-              [type]="field.type"
-            />
+          <!-- Campo de texto -->
+          <div *ngSwitchCase="'text'">
+            <!-- Contenedor para el campo de texto con etiquetas y control -->
+            <div class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg">
+              <label [for]="field.name" class="text-white font-bold">{{
+                field.label
+              }}</label>
+              <input
+                class="rounded-xl"
+                [id]="field.name"
+                [formControlName]="field.name"
+                [type]="field.type"
+              />
+            </div>
+            <!-- Mostrar errores si el campo nombre es inválido -->
+            <div
+              *ngIf="
+                formGroup.get(field.name)?.invalid &&
+                formGroup.get(field.name)?.touched
+              "
+              class="text-red-500"
+            >
+              <span *ngIf="formGroup.get(field.name)?.errors?.['required']"
+                >{{ field.label }} es obligatorio.</span
+              >
+              <span *ngIf="formGroup.get(field.name)?.errors?.['minlength']"
+                >Mínimo
+                {{ formGroup.get(field.name)?.errors?.['minlength']?.requiredLength }}
+                caracteres.</span
+              >
+            </div>
           </div>
 
-          <!-- Campos de fecha -->
-          <div
-            *ngSwitchCase="'date'"
-            class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
-          >
-            <label [for]="field.name" class="text-white font-bold">{{
-              field.label
-            }}</label>
-            <input
-              class="rounded-xl"
-              [id]="field.name"
-              [formControlName]="field.name"
-              [type]="field.type"
-            />
+          <!-- Campo de fecha -->
+          <div *ngSwitchCase="'date'">
+            <!-- Contenedor para el campo de fecha con etiquetas y control -->
+            <div class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg">
+              <label [for]="field.name" class="text-white font-bold">{{
+                field.label
+              }}</label>
+              <input
+                class="rounded-xl"
+                [id]="field.name"
+                [formControlName]="field.name"
+                [type]="field.type"
+              />
+            </div>
+            <!-- Mostrar error si la fecha límite es inválida -->
+            <div
+              *ngIf="
+                formGroup.get(field.name)?.invalid &&
+                formGroup.get(field.name)?.touched
+              "
+              class="text-red-500"
+            >
+              <span *ngIf="formGroup.get(field.name)?.errors?.['required']"
+                >{{ field.label }} es obligatoria.</span
+              >
+            </div>
           </div>
 
-          <!-- Arreglo de personas asociadas -->
+          <!-- Campo de personas asociadas (array) -->
           <div
             *ngSwitchCase="'array'"
             class="flex flex-col gap-2 rounded-xl bg-slate-600 p-3"
           >
-            <label class="text-white font-bold">{{ field.label }}</label>
+            <div class="flex justify-between items-center">
+              <label class="text-white font-bold">{{ field.label }}</label>
+              <!-- Botón para agregar nueva persona -->
+              <button
+                type="button"
+                class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
+                (click)="agregarPersona()"
+              >
+                <span class="material-symbols-outlined"> person_add </span>
+              </button>
+            </div>
 
-            <button
-              type="button"
-              class="bg-blue-500 rounded-lg text-white p-2 flex justify-center"
-              (click)="agregarPersona()"
-            >
-              Añadir Persona
-              <span class="material-symbols-outlined pl-2"> person_add </span>
-            </button>
-
-            <!-- Recorre el FormArray personas_asociadas -->
+            <!-- Listado dinámico de personas asociadas -->
             <div formArrayName="personas_asociadas" class="flex flex-col gap-3">
               <div
                 *ngFor="
@@ -69,59 +102,103 @@
                 "
                 [formGroupName]="i"
               >
-                <div class="flex flex-col gap-4 bg-slate-700 p-3 rounded-lg">
-                  <!-- Campo Nombre -->
-                  <div class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg">
-                    <label class="text-white">Nombre completo:</label>
-
-                    <input formControlName="nombre" class="rounded-lg" />
-                  </div>
-
-                  <!-- Errores de validación del campo nombre -->
-                  <div
-                    *ngIf="
-                      persona.get('nombre')?.invalid &&
-                      persona.get('nombre')?.touched
-                    "
-                    class="text-red-500"
-                  >
-                    <span *ngIf="persona.get('nombre')?.errors?.['required']"
-                      >El nombre es obligatorio.</span
+                <div class="flex flex-col gap-4 bg-slate-500 p-3 rounded-lg">
+                  <!-- Título de persona y botón para eliminar -->
+                  <div class="flex justify-between items-center">
+                    <h1 class="text-white font-normal">
+                      Persona # {{ i + 1 }}
+                    </h1>
+                    <button
+                      type="button"
+                      class="bg-red-500 rounded-lg text-white p-2 flex justify-center"
+                      (click)="eliminarPersona(i)"
+                      [disabled]="getPersonasAsociadas().length === 1"
+                      [ngClass]="{
+                        'hover:bg-red-300': getPersonasAsociadas().length > 1,
+                        'opacity-50 bg-red-200 cursor-default':
+                          getPersonasAsociadas().length === 1
+                      }"
                     >
+                      <span class="material-symbols-outlined"
+                        >person_remove</span
+                      >
+                    </button>
                   </div>
 
-                  <!-- Campo Edad -->
-                  <div class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg">
-                    <label class="text-white">Edad:</label>
-                    <input
-                      formControlName="edad"
-                      type="number"
-                      class="rounded-lg"
-                    />
-                  </div>
-
-                  <!-- Errores de validación del campo edad -->
-                  <div
-                    *ngIf="
-                      persona.get('edad')?.invalid &&
-                      persona.get('edad')?.touched
-                    "
-                    class="text-red-500"
-                  >
-                    <span *ngIf="persona.get('edad')?.errors?.['required']"
-                      >La edad es obligatoria.</span
+                  <!-- Campo Nombre dentro del grupo de persona -->
+                  <div>
+                    <div
+                      class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
                     >
-                    <span *ngIf="persona.get('edad')?.errors?.['max']"
-                      >Máximo 3 caracteres.</span
+                      <label class="text-white font-bold"
+                        >Nombre completo:</label
+                      >
+                      <input formControlName="nombre" class="rounded-lg" />
+                    </div>
+                    <!-- Mostrar errores si el nombre de la persona es inválido -->
+                    <div
+                      *ngIf="
+                        persona.get('nombre')?.invalid &&
+                        persona.get('nombre')?.touched
+                      "
+                      class="text-red-500"
                     >
+                      <span *ngIf="persona.get('nombre')?.errors?.['required']"
+                        >El nombre es obligatorio.</span
+                      >
+                      <span *ngIf="persona.get('nombre')?.errors?.['minlength']"
+                        >Mínimo 5 caracteres.</span
+                      >
+                    </div>
                   </div>
 
-                  <!-- Habilidades -->
+                  <!-- Campo Edad dentro del grupo de persona -->
+                  <div>
+                    <div
+                      class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
+                    >
+                      <label class="text-white font-bold">Edad:</label>
+                      <input
+                        formControlName="edad"
+                        type="number"
+                        class="rounded-lg"
+                      />
+                    </div>
+                    <!-- Mostrar errores si la edad es inválida -->
+                    <div
+                      *ngIf="
+                        persona.get('edad')?.invalid &&
+                        persona.get('edad')?.touched
+                      "
+                      class="text-red-500"
+                    >
+                      <span *ngIf="persona.get('edad')?.errors?.['required']"
+                        >La edad es obligatoria.</span
+                      >
+                      <span *ngIf="persona.get('edad')?.errors?.['min']"
+                        >Debes ser mayor de 18 años.</span
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Campo Habilidades (array) dentro del grupo de persona -->
                   <div
                     formArrayName="habilidades"
-                    class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
+                    class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
                   >
-                    <label class="text-white">Habilidades:</label>
+                    <div class="flex justify-between items-center">
+                      <label class="text-white font-bold">Habilidades</label>
+                      <!-- Botón para agregar nueva habilidad -->
+                      <button
+                        type="button"
+                        class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
+                        (click)="agregarHabilidad(i)"
+                      >
+                        <span class="material-symbols-outlined"> add </span>
+                      </button>
+                    </div>
+
+                    <!-- Listado dinámico de habilidades dentro de la persona -->
                     <div
                       *ngFor="
                         let habilidad of getHabilidades(i).controls;
@@ -130,23 +207,31 @@
                       [formGroupName]="j"
                     >
                       <div
-                        class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
+                        class="flex flex-col gap-2 bg-slate-700 p-3 rounded-lg"
                       >
+                        <div class="flex justify-between items-center">
+                          <label for="nombre" class="text-white font-thin"
+                            >Habilidad #{{ j + 1 }}</label
+                          >
+                          <button
+                            type="button"
+                            [disabled]="getHabilidades(i).length === 1"
+                            [ngClass]="{
+                              'hover:bg-red-400': getHabilidades(i).length > 1,
+                              'opacity-50 bg-red-200 cursor-default':
+                                getHabilidades(i).length === 1
+                            }"
+                            class="bg-red-500 rounded-lg text-white p-2 flex justify-center hover:bg-red-400"
+                            (click)="eliminarHabilidad(i, j)"
+                          >
+                            <span class="material-symbols-outlined"
+                              >remove</span
+                            >
+                          </button>
+                        </div>
                         <input formControlName="nombre" class="rounded-lg" />
-
-                        <button
-                          type="button"
-                          class="bg-red-500 rounded-lg text-white p-2 flex justify-center"
-                          (click)="eliminarHabilidad(i, j)"
-                        >
-                          Eliminar Habilidad
-                          <span class="material-symbols-outlined pl-2">
-                            remove_moderator
-                          </span>
-                        </button>
                       </div>
-
-                      <!-- Errores de validación del campo habilidades -->
+                      <!-- Mostrar errores si el nombre de la habilidad es inválido -->
                       <div
                         *ngIf="
                           habilidad.get('nombre')?.invalid &&
@@ -160,51 +245,18 @@
                         >
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      class="bg-blue-500 rounded-lg text-white p-2 flex justify-center"
-                      (click)="agregarHabilidad(i)"
-                    >
-                      Añadir Habilidad
-                      <span class="material-symbols-outlined pl-2">
-                        add_moderator
-                      </span>
-                    </button>
                   </div>
-
-                  <button
-                    type="button"
-                    class="bg-red-500 rounded-lg text-white p-2 flex justify-center"
-                    (click)="eliminarPersona(i)"
-                  >
-                    Eliminar Persona
-                    <span class="material-symbols-outlined pl-2">
-                      person_remove
-                    </span>
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Mensaje de error -->
-          <div
-            *ngIf="
-              formGroup.get(field.name)?.invalid &&
-              formGroup.get(field.name)?.touched
-            "
-            class="text-red-500"
-          >
-            <span *ngIf="formGroup.get(field.name)?.errors?.['required']"
-              >Este campo es obligatorio.</span
-            >
           </div>
         </ng-container>
       </div>
     </div>
 
+    <!-- Botón de enviar formulario -->
     <button
-      class="bg-blue-500 rounded-lg text-white p-2 flex justify-center"
+      class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
       type="submit"
     >
       Guardar Tarea

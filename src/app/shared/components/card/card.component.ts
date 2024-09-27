@@ -1,14 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+// Define una interfaz para los campos del formulario
+interface FormField {
+  name: string;
+  type: string;
+  label: string;
+  validators: { required?: boolean; minlength?: number; min?: number };
+}
+
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.css'],
 })
 export class CardComponent implements OnInit {
-  formGroup: FormGroup = this.fb.group({});
+  formGroup: FormGroup;
 
+  // Estructura del formulario
   formStructure = {
     title: 'Crear Nueva Tarea',
     description: 'Completa los datos para crear una tarea.',
@@ -17,99 +26,102 @@ export class CardComponent implements OnInit {
         name: 'nombre',
         type: 'text',
         label: 'Nombre de la tarea:',
-        validators: [Validators.required],
+        validators: { required: true, minlength: 5 },
       },
       {
         name: 'fecha_limite',
         type: 'date',
         label: 'Fecha límite:',
-        validators: [Validators.required],
+        validators: { required: true },
       },
       {
         name: 'personas_asociadas',
         type: 'array',
-        label: 'Personas Asociadas: ',
-        validators: [], // Puedes manejar la validación en el submit
+        label: 'Personas Asociadas',
+        validators: {},
       },
-    ],
+    ] as FormField[], // Especificar que `fields` es un arreglo de `FormField`
   };
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) {
+    this.formGroup = this.fb.group({});
+  }
 
   ngOnInit(): void {
     this.createForm();
   }
 
-  // Crear el formulario principal
   createForm() {
-    const group: { [key: string]: any } = {};
+    const group: { [key: string]: any } = {}; // Usar un objeto que pueda ser indexado
     this.formStructure.fields.forEach((field) => {
-      const validators = field.validators || [];
+      const validators = this.mapValidators(field.validators || {});
       if (field.type === 'array') {
-        // Inicializamos el array de personas con un grupo vacío
-        group[field.name] = this.fb.array([this.crearPersona()]); // Añadir una persona al inicio
+        group[field.name] = this.fb.array([this.crearPersona()]);
       } else {
         group[field.name] = this.fb.control('', validators);
       }
     });
-    this.formGroup = this.fb.group(group);
+    this.formGroup = this.fb.group(group); // Crear el grupo con los campos procesados
   }
 
-  // Obtener el FormArray de personas asociadas
+  mapValidators(validators: {
+    required?: boolean;
+    minlength?: number;
+    min?: number;
+  }) {
+    const mappedValidators = [];
+    if (validators.required) mappedValidators.push(Validators.required);
+    if (validators.minlength)
+      mappedValidators.push(Validators.minLength(validators.minlength));
+    if (validators.min) mappedValidators.push(Validators.min(validators.min));
+    return mappedValidators;
+  }
+
   getPersonasAsociadas(): FormArray {
     return this.formGroup.get('personas_asociadas') as FormArray;
   }
 
-  // Crear un FormGroup para una persona
   crearPersona(): FormGroup {
     return this.fb.group({
-      nombre: ['', Validators.required],
-      edad: ['', [Validators.required, Validators.max(3)]], // Validación de edad
-      habilidades: this.fb.array([this.crearHabilidad()]), // Inicializamos el array de habilidades con un grupo vacío
+      nombre: ['', this.mapValidators({ required: true, minlength: 5 })],
+      edad: ['', this.mapValidators({ required: true, min: 18 })],
+      habilidades: this.fb.array([this.crearHabilidad()]),
     });
   }
 
-  // Obtener el FormArray de habilidades de una persona
+  agregarPersona() {
+    this.getPersonasAsociadas().push(this.crearPersona());
+  }
+
+  eliminarPersona(index: number) {
+    this.getPersonasAsociadas().removeAt(index);
+  }
+
   getHabilidades(index: number): FormArray {
     return (this.getPersonasAsociadas().at(index) as FormGroup).get(
       'habilidades'
     ) as FormArray;
   }
 
-  // Añadir una persona al FormArray
-  agregarPersona() {
-    this.getPersonasAsociadas().push(this.crearPersona());
-  }
-
-  // Eliminar una persona del FormArray
-  eliminarPersona(index: number) {
-    this.getPersonasAsociadas().removeAt(index);
-  }
-
-  // Añadir una habilidad a una persona
   agregarHabilidad(personaIndex: number) {
     this.getHabilidades(personaIndex).push(this.crearHabilidad());
   }
 
-  // Crear un FormGroup para una habilidad
   crearHabilidad(): FormGroup {
     return this.fb.group({
-      nombre: ['', Validators.required], // Validación de habilidad
+      nombre: ['', Validators.required],
     });
   }
 
-  // Eliminar una habilidad de una persona
   eliminarHabilidad(personaIndex: number, habilidadIndex: number) {
     this.getHabilidades(personaIndex).removeAt(habilidadIndex);
   }
 
-  // Envío del formulario
   onSubmit() {
     if (this.formGroup.invalid) {
-      this.formGroup.markAllAsTouched(); // Marca todos los campos como tocados
+      this.formGroup.markAllAsTouched();
       return;
     }
-
-    console.log(this.formGroup.value); // Aquí podrías manejar el envío de datos
+    console.log(this.formGroup.value);
   }
 }
