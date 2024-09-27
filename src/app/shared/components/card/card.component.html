@@ -1,0 +1,214 @@
+<div class="bg-gray-800 p-8 m-2 rounded-lg">
+  <div>
+    <h1 class="text-white font-bold text-lg pb-2 flex items-center">
+      {{ formStructure.title }}
+      <span class="material-symbols-outlined pl-2"> playlist_add </span>
+    </h1>
+    <hr />
+    <h3 class="text-white font-light">{{ formStructure.description }}</h3>
+  </div>
+
+  <form class="flex flex-col" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+    <div class="flex flex-col gap-4 py-6">
+      <div *ngFor="let field of formStructure.fields">
+        <ng-container [ngSwitch]="field.type">
+          <!-- Campos de texto -->
+          <div
+            *ngSwitchCase="'text'"
+            class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
+          >
+            <label [for]="field.name" class="text-white font-bold">{{
+              field.label
+            }}</label>
+            <input
+              class="rounded-xl"
+              [id]="field.name"
+              [formControlName]="field.name"
+              [type]="field.type"
+            />
+          </div>
+
+          <!-- Campos de fecha -->
+          <div
+            *ngSwitchCase="'date'"
+            class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
+          >
+            <label [for]="field.name" class="text-white font-bold">{{
+              field.label
+            }}</label>
+            <input
+              class="rounded-xl"
+              [id]="field.name"
+              [formControlName]="field.name"
+              [type]="field.type"
+            />
+          </div>
+
+          <!-- Arreglo de personas asociadas -->
+          <div
+            *ngSwitchCase="'array'"
+            class="flex flex-col gap-2 rounded-xl bg-slate-600 p-3"
+          >
+            <label class="text-white font-bold">{{ field.label }}</label>
+
+            <button
+              type="button"
+              class="bg-blue-500 rounded-lg text-white p-2 flex justify-center"
+              (click)="agregarPersona()"
+            >
+              Añadir Persona
+              <span class="material-symbols-outlined pl-2"> person_add </span>
+            </button>
+
+            <!-- Recorre el FormArray personas_asociadas -->
+            <div formArrayName="personas_asociadas" class="flex flex-col gap-3">
+              <div
+                *ngFor="
+                  let persona of getPersonasAsociadas().controls;
+                  let i = index
+                "
+                [formGroupName]="i"
+              >
+                <div class="flex flex-col gap-4 bg-slate-700 p-3 rounded-lg">
+                  <!-- Campo Nombre -->
+                  <div class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg">
+                    <label class="text-white">Nombre completo:</label>
+
+                    <input formControlName="nombre" class="rounded-lg" />
+                  </div>
+
+                  <!-- Errores de validación del campo nombre -->
+                  <div
+                    *ngIf="
+                      persona.get('nombre')?.invalid &&
+                      persona.get('nombre')?.touched
+                    "
+                    class="text-red-500"
+                  >
+                    <span *ngIf="persona.get('nombre')?.errors?.['required']"
+                      >El nombre es obligatorio.</span
+                    >
+                  </div>
+
+                  <!-- Campo Edad -->
+                  <div class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg">
+                    <label class="text-white">Edad:</label>
+                    <input
+                      formControlName="edad"
+                      type="number"
+                      class="rounded-lg"
+                    />
+                  </div>
+
+                  <!-- Errores de validación del campo edad -->
+                  <div
+                    *ngIf="
+                      persona.get('edad')?.invalid &&
+                      persona.get('edad')?.touched
+                    "
+                    class="text-red-500"
+                  >
+                    <span *ngIf="persona.get('edad')?.errors?.['required']"
+                      >La edad es obligatoria.</span
+                    >
+                    <span *ngIf="persona.get('edad')?.errors?.['max']"
+                      >Máximo 3 caracteres.</span
+                    >
+                  </div>
+
+                  <!-- Habilidades -->
+                  <div
+                    formArrayName="habilidades"
+                    class="flex flex-col gap-2 bg-slate-500 p-3 rounded-lg"
+                  >
+                    <label class="text-white">Habilidades:</label>
+                    <div
+                      *ngFor="
+                        let habilidad of getHabilidades(i).controls;
+                        let j = index
+                      "
+                      [formGroupName]="j"
+                    >
+                      <div
+                        class="flex flex-col gap-2 bg-slate-600 p-3 rounded-lg"
+                      >
+                        <input formControlName="nombre" class="rounded-lg" />
+
+                        <button
+                          type="button"
+                          class="bg-red-500 rounded-lg text-white p-2 flex justify-center"
+                          (click)="eliminarHabilidad(i, j)"
+                        >
+                          Eliminar Habilidad
+                          <span class="material-symbols-outlined pl-2">
+                            remove_moderator
+                          </span>
+                        </button>
+                      </div>
+
+                      <!-- Errores de validación del campo habilidades -->
+                      <div
+                        *ngIf="
+                          habilidad.get('nombre')?.invalid &&
+                          habilidad.get('nombre')?.touched
+                        "
+                        class="text-red-500"
+                      >
+                        <span
+                          *ngIf="habilidad.get('nombre')?.errors?.['required']"
+                          >La habilidad es obligatoria.</span
+                        >
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="bg-blue-500 rounded-lg text-white p-2 flex justify-center"
+                      (click)="agregarHabilidad(i)"
+                    >
+                      Añadir Habilidad
+                      <span class="material-symbols-outlined pl-2">
+                        add_moderator
+                      </span>
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="bg-red-500 rounded-lg text-white p-2 flex justify-center"
+                    (click)="eliminarPersona(i)"
+                  >
+                    Eliminar Persona
+                    <span class="material-symbols-outlined pl-2">
+                      person_remove
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje de error -->
+          <div
+            *ngIf="
+              formGroup.get(field.name)?.invalid &&
+              formGroup.get(field.name)?.touched
+            "
+            class="text-red-500"
+          >
+            <span *ngIf="formGroup.get(field.name)?.errors?.['required']"
+              >Este campo es obligatorio.</span
+            >
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <button
+      class="bg-blue-500 rounded-lg text-white p-2 flex justify-center"
+      type="submit"
+    >
+      Guardar Tarea
+      <span class="material-symbols-outlined pl-2"> playlist_add </span>
+    </button>
+  </form>
+</div>
