@@ -8,7 +8,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { ValidarNombresUnicosService } from '../../validators/validar-nombres-unicos.service';
-import { FormFieldInterface } from '../../interfaces/form-field-interface';
+import { FormField } from '../../interfaces/form-field';
+import { Store } from '@ngrx/store';
+import { addTask } from 'src/app/store/actions/task.actions';
 
 @Component({
   selector: 'app-card',
@@ -27,29 +29,30 @@ export class CardComponent implements OnInit {
     title: 'Crear Nueva Tarea',
     fields: [
       {
-        name: 'nombre',
+        name: 'title',
         type: 'text',
         label: 'Nombre de la tarea:',
         validators: { required: true, minlength: 5 },
       },
       {
-        name: 'fecha_limite',
+        name: 'dueDate',
         type: 'date',
         label: 'Fecha límite:',
         validators: { required: true },
       },
       {
-        name: 'personas_asociadas',
+        name: 'associatedPeople',
         type: 'array',
         label: 'Personas Asociadas',
         validators: {},
       },
-    ] as FormFieldInterface[], // Especificar que `fields` es un arreglo de `FormField`
+    ] as FormField[],
   };
 
   constructor(
     private fb: FormBuilder,
-    private validarNombresUnicosValidator: ValidarNombresUnicosService
+    private validarNombresUnicosValidator: ValidarNombresUnicosService,
+    private store: Store
   ) {
     this.formGroup = this.fb.group({});
   }
@@ -59,7 +62,7 @@ export class CardComponent implements OnInit {
   }
 
   createForm() {
-    const group: { [key: string]: any } = {}; // Usar un objeto que pueda ser indexado
+    const group: { [key: string]: any } = {};
     this.formStructure.fields.forEach((field) => {
       const validators = this.mapValidators(field.validators || {});
       if (field.type === 'array') {
@@ -71,7 +74,7 @@ export class CardComponent implements OnInit {
         group[field.name] = this.fb.control('', validators);
       }
     });
-    this.formGroup = this.fb.group(group); // Crear el grupo con los campos procesados
+    this.formGroup = this.fb.group(group);
   }
 
   mapValidators(validators: {
@@ -88,14 +91,14 @@ export class CardComponent implements OnInit {
   }
 
   getPersonasAsociadas(): FormArray {
-    return this.formGroup.get('personas_asociadas') as FormArray;
+    return this.formGroup.get('associatedPeople') as FormArray;
   }
 
   crearPersona(): FormGroup {
     return this.fb.group({
-      nombre: ['', this.mapValidators({ required: true, minlength: 5 })],
-      edad: ['', this.mapValidators({ required: true, min: 18 })],
-      habilidades: this.fb.array([this.crearHabilidad()]),
+      name: ['', this.mapValidators({ required: true, minlength: 5 })],
+      age: ['', this.mapValidators({ required: true, min: 18 })],
+      skills: this.fb.array([this.crearHabilidad()]),
     });
   }
 
@@ -109,7 +112,7 @@ export class CardComponent implements OnInit {
 
   getHabilidades(index: number): FormArray {
     return (this.getPersonasAsociadas().at(index) as FormGroup).get(
-      'habilidades'
+      'skills'
     ) as FormArray;
   }
 
@@ -127,6 +130,22 @@ export class CardComponent implements OnInit {
     this.getHabilidades(personaIndex).removeAt(habilidadIndex);
   }
 
+  transformTaskData(formValue: any) {
+    return {
+      title: formValue.title,
+      dueDate: formValue.dueDate,
+      associatedPeople: formValue.associatedPeople.map((persona: any) => ({
+        name: persona.name,
+        age: persona.age,
+        // Transforma las habilidades en cadenas de texto si son objetos
+        skills: persona.skills.map((habilidad: any) =>
+          typeof habilidad === 'object' ? habilidad.nombre : habilidad
+        ),
+      })),
+      completed: false,
+    };
+  }
+
   onSubmit() {
     if (this.formGroup.invalid) {
       this.formGroup.markAllAsTouched();
@@ -135,11 +154,13 @@ export class CardComponent implements OnInit {
 
     this.isLoading = true;
 
+    this.store.dispatch(
+      addTask({ task: this.transformTaskData(this.formGroup.value) })
+    );
+
     setTimeout(() => {
       this.isLoading = false;
       this.onClose.emit();
     }, 3000);
-
-    console.log(this.formGroup.value);
   }
 }

@@ -4,7 +4,7 @@
       Lista de Tareas
       <span class="material-symbols-outlined pl-2"> list </span>
     </h1>
-    <!-- Botón para agregar nueva persona -->
+    <!-- Botón para agregar nueva tarea -->
     <button
       type="button"
       class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
@@ -15,8 +15,14 @@
   </div>
   <hr />
 
-  <!-- Filtros -->
+  <!-- Filtros para la lista de tareas -->
   <div class="flex flex-wrap space-x-1 my-4">
+    <button
+      class="bg-sky-500 rounded-lg text-white p-2 hover:bg-sky-400 flex-1 m-1"
+      (click)="filterTasks('completed')"
+    >
+      Completadas
+    </button>
     <button
       class="bg-blue-500 rounded-lg text-white p-2 hover:bg-blue-400 flex-1 m-1"
       (click)="filterTasks('all')"
@@ -25,67 +31,62 @@
     </button>
     <button
       class="bg-sky-500 rounded-lg text-white p-2 hover:bg-sky-400 flex-1 m-1"
-      (click)="filterTasks('completed')"
-    >
-      Completadas
-    </button>
-    <button
-      class="bg-cyan-500 rounded-lg text-white p-2 hover:bg-cyan-400 flex-1 m-1"
       (click)="filterTasks('pending')"
     >
       Pendientes
     </button>
   </div>
 
-  <!-- Listado de Tareas -->
-  <div *ngFor="let task of filteredTasks" class="mb-4">
-    <div class="bg-slate-700 p-4 rounded-lg items-center pb-4">
-      <label class="flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          [(ngModel)]="task.completed"
-          (change)="toggleTaskCompletion(task)"
-          class="sr-only"
-        />
-        <div
-          class="w-10 h-6 bg-gray-400 rounded-full flex items-center p-1 transition duration-200 ease-in-out"
-          [class.bg-blue-500]="task.completed"
-        >
+  <div *ngIf="tasks$ | async as tasks">
+    <div *ngFor="let tarea of getFilteredTasks(tasks)" class="mb-4">
+      <div class="bg-slate-700 p-4 rounded-lg items-center pb-4">
+        <label class="flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            [(ngModel)]="tarea.completed"
+            (change)="toggleTaskCompletion(tarea)"
+            class="sr-only"
+          />
           <div
-            class="dot w-4 h-4 bg-white rounded-full shadow-md transform transition duration-200 ease-in-out"
-            [class.translate-x-4]="task.completed"
-          ></div>
-        </div>
-        <span class="ml-2 text-white"
-          >{{ task.title }} - {{ task.dueDate }}</span
-        >
-      </label>
-      <div class="text-gray-300 mt-2 bg-slate-600 p-3 rounded-lg">
-        <p class="text-lg font-light pb-2">Personas Asociadas:</p>
-        <div *ngFor="let person of task.associatedPeople" class="mb-4">
-          <div class="bg-slate-500 p-3 rounded-lg">
-            <div class="flex flex-col md:flex-row justify-between gap-2">
-              <p class="font-bold">{{ person.name }}</p>
-              <p>{{ person.age }} Años</p>
-            </div>
-            <div class="flex flex-col md:flex-row gap-2">
-              <p class="font-bold">Habilidades:</p>
-              <p>{{ person.skills.join(", ") }}</p>
+            class="w-10 h-6 bg-gray-400 rounded-full flex items-center p-1 transition duration-200 ease-in-out"
+            [class.bg-blue-500]="tarea.completed"
+          >
+            <div
+              class="dot w-4 h-4 bg-white rounded-full shadow-md transform transition duration-200 ease-in-out"
+              [class.translate-x-4]="tarea.completed"
+            ></div>
+          </div>
+          <span class="ml-2 text-white"
+            >{{ tarea.title }} - {{ tarea.dueDate }}</span
+          >
+        </label>
+        <div class="text-gray-300 mt-2 bg-slate-600 p-3 rounded-lg">
+          <p class="text-lg font-light pb-2">Personas Asociadas:</p>
+          <div *ngFor="let persona of tarea.associatedPeople" class="mb-4">
+            <div class="bg-slate-500 p-3 rounded-lg">
+              <div class="flex flex-col md:flex-row justify-between gap-2">
+                <p class="font-bold">{{ persona.name }}</p>
+                <p>{{ persona.age }} Años</p>
+              </div>
+              <div class="flex flex-col md:flex-row gap-2">
+                <p class="font-bold">Habilidades:</p>
+                <p>{{ persona.skills.join(", ") }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Create -->
-<div
-  *ngIf="createModal"
-  id="modal-container-create-task"
-  class="modal-container"
->
-  <div class="modal-content">
-    <app-card (onClose)="onClose('create')"></app-card>
+    <!-- Modal para Crear Nueva Tarea -->
+    <div
+      *ngIf="createModal"
+      id="modal-container-create-task"
+      class="modal-container"
+    >
+      <div class="modal-content">
+        <app-card (onClose)="onClose('create')"></app-card>
+      </div>
+    </div>
   </div>
 </div>
