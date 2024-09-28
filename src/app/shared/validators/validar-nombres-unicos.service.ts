@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormArray, ValidationErrors } from '@angular/forms';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ValidarNombresUnicosService {
-  // Validador personalizado para asegurar que los nombres sean únicos
   validarNombresUnicos(control: AbstractControl): ValidationErrors | null {
-    const formArray = control as FormArray;
-    const nombres = formArray.controls.map((group) =>
-      group.get('nombre')?.value?.toLowerCase().trim()
-    );
+    const personas = control.value;
+    const nombres = personas.map((persona: any) => persona.name);
 
     const nombresUnicos = new Set(nombres);
-    const tieneDuplicados = nombresUnicos.size !== nombres.length;
 
-    return tieneDuplicados ? { nombreDuplicado: true } : null;
+    if (nombres.length !== nombresUnicos.size) {
+      return { nombreDuplicado: true }; // Retorna un error si hay nombres duplicados
+    }
+
+    return null; // Si no hay duplicados, no retorna error
   }
 }
