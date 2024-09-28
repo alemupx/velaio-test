@@ -104,12 +104,19 @@
               <label class="text-white font-bold">{{ field.label }}</label>
               <button
                 type="button"
-                class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
+                class="sm:flex hidden bg-blue-500 rounded-lg text-white p-2 justify-center hover:bg-blue-400"
                 (click)="agregarPersona()"
               >
                 <span class="material-symbols-outlined"> person_add </span>
               </button>
             </div>
+            <button
+              type="button"
+              class="sm:hidden flex bg-blue-500 rounded-lg text-white p-2 justify-center hover:bg-blue-400"
+              (click)="agregarPersona()"
+            >
+              <span class="material-symbols-outlined"> person_add </span>
+            </button>
 
             <div
               *ngIf="
@@ -136,7 +143,7 @@
                     </h1>
                     <button
                       type="button"
-                      class="bg-red-500 rounded-lg text-white p-2 flex justify-center"
+                      class="hidden sm:flex bg-red-500 rounded-lg text-white p-2 justify-center"
                       (click)="eliminarPersona(i)"
                       [disabled]="getPersonasAsociadas().length === 1"
                       [ngClass]="{
@@ -150,6 +157,22 @@
                       </span>
                     </button>
                   </div>
+
+                  <button
+                    type="button"
+                    class="sm:hidden flex bg-red-500 rounded-lg text-white p-2 justify-center"
+                    (click)="eliminarPersona(i)"
+                    [disabled]="getPersonasAsociadas().length === 1"
+                    [ngClass]="{
+                      'hover:bg-red-300': getPersonasAsociadas().length > 1,
+                      'opacity-50 bg-red-200 cursor-default':
+                        getPersonasAsociadas().length === 1
+                    }"
+                  >
+                    <span class="material-symbols-outlined">
+                      person_remove
+                    </span>
+                  </button>
 
                   <div>
                     <div
@@ -211,12 +234,20 @@
                       <label class="text-white font-bold">Habilidades</label>
                       <button
                         type="button"
-                        class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
+                        class="sm:flex hidden bg-blue-500 rounded-lg text-white p-2 justify-center hover:bg-blue-400"
                         (click)="agregarHabilidad(i)"
                       >
                         <span class="material-symbols-outlined"> add </span>
                       </button>
                     </div>
+
+                    <button
+                      type="button"
+                      class="sm:hidden flex bg-blue-500 rounded-lg text-white p-2 justify-center hover:bg-blue-400"
+                      (click)="agregarHabilidad(i)"
+                    >
+                      <span class="material-symbols-outlined"> add </span>
+                    </button>
 
                     <div
                       *ngFor="
@@ -240,7 +271,7 @@
                               'opacity-50 bg-red-200 cursor-default':
                                 getHabilidades(i).length === 1
                             }"
-                            class="bg-red-500 rounded-lg text-white p-2 flex justify-center hover:bg-red-400"
+                            class="sm:flex hidden bg-red-500 rounded-lg text-white p-2 justify-center hover:bg-red-400"
                             (click)="eliminarHabilidad(i, j)"
                           >
                             <span class="material-symbols-outlined">
@@ -248,8 +279,25 @@
                             </span>
                           </button>
                         </div>
+                        <button
+                          type="button"
+                          [disabled]="getHabilidades(i).length === 1"
+                          [ngClass]="{
+                            'hover:bg-red-400': getHabilidades(i).length > 1,
+                            'opacity-50 bg-red-200 cursor-default':
+                              getHabilidades(i).length === 1
+                          }"
+                          class="sm:hidden flex bg-red-500 rounded-lg text-white p-2 justify-center hover:bg-red-400"
+                          (click)="eliminarHabilidad(i, j)"
+                        >
+                          <span class="material-symbols-outlined">
+                            remove
+                          </span>
+                        </button>
+
                         <input formControlName="nombre" class="rounded-lg" />
                       </div>
+
                       <div
                         *ngIf="
                           habilidad.get('nombre')?.invalid &&
