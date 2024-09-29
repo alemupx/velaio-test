@@ -1,4 +1,4 @@
-<div class="bg-gray-800 p-8 m-4 rounded-lg">
+<div class="bg-gray-800 p-8 m-4 rounded-lg flex flex-col gap-2">
   <div class="flex py-2 justify-between items-center">
     <h1 class="text-white font-black text-lg pb-2 flex items-center">
       Lista de Tareas
@@ -7,12 +7,21 @@
     <!-- Botón para agregar nueva tarea -->
     <button
       type="button"
-      class="bg-blue-500 rounded-lg text-white p-2 flex justify-center hover:bg-blue-400"
+      class="sm:flex hidden bg-blue-500 rounded-lg text-white p-2 justify-center hover:bg-blue-400"
       (click)="onOpen('create')"
     >
       <span class="material-symbols-outlined"> playlist_add </span>
     </button>
   </div>
+
+  <button
+    type="button"
+    class="sm:hidden flex bg-blue-500 rounded-lg text-white p-2 justify-center hover:bg-blue-400"
+    (click)="onOpen('create')"
+  >
+    <span class="material-symbols-outlined"> playlist_add </span>
+  </button>
+
   <hr />
 
   <!-- Filtros para la lista de tareas -->
